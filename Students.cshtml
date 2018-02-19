@@ -1,0 +1,195 @@
+﻿@model Park_University_MVC.Models.StudentsManagementVM
+
+@{
+    ViewBag.Title = "Students";
+}
+
+<h2>Students</h2>
+
+@using (Html.BeginForm())
+{
+    <table>
+        <tr>
+            <th>
+                <hr />List of Students
+            </th>
+        </tr>
+        <tr>    
+            <td>
+                @Html.ActionLink("Add New Student", "_CreateStudent")
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table class="table">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].StudentId)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].FirstName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].LastName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].City)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].State)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].Email)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.STDList[0].Telephone)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model.STDList)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StudentId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FirstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.LastName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.City)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.State)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Telephone)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "_UpdateStudent", new { studentId = item.StudentId },new { @class="EditStudent"}) |
+                                @Html.ActionLink("Delete", "_DeleteStudent", new { studentId = item.StudentId }, new { @class = "DeleteStudent" })
+                            </td>
+                        </tr>
+                    }
+                    </table>
+            </td>
+        </tr>
+    </table>
+}
+<div id="EditDialogDiv" style="display:none"></div>
+<div id="dlgConfirm" style="display:none" title="Delete Selected Row?">
+    <p>
+        <span class="ui-icon ui-icon-alert" style="float:left;margin:0 7px 20px 0"></span>
+        Selected Row Delete, Confirm?
+    </p>
+</div>
+
+@section Scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+        $(function () {
+            $('#EditDialogDiv').on('hide', function () {
+                location.reload();
+            });
+            $(".DeleteStudent").on("click", function (e) {
+                var rowDel = $(this).closest('tr');
+                $('#dlgConfirm').show();
+                $("#dlgConfirm").dialog({
+                    buttons: {
+                        Confirm: function () {
+                            $(this).dialog("close");
+                            id = rowDel.children('td:first').text();
+                            $.ajax({
+                                url: "DeleteStudent/"+ id,
+                                success: function () {
+                                    rowDel.remove().draw();
+                                    $("#dlgConfirm").hide();
+                                },
+                                error: function (xmlhttp, textStatus, errorThrown) {
+                                    alert(errorThrown);
+                                }
+                            });
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    },
+                    "modal": true
+                });
+                e.preventDefault();
+                return false;
+            });
+
+            var DialogEdit = function () {
+                this.showDialog = function (url) {
+                    $("#EditDialogDiv").dialog({
+                        autoOpen: true,
+                        width: "600",
+                        resizable: false,
+                        title: "Edit Student",
+                        modal: true,
+                        closeText: "X",
+                        dialogclass: 'alert',
+                        position: {
+                            my: "center",
+                            at: "top+150"
+                        },
+                        closeOnEscape: true,
+                        open: function () {
+                            $(this).load(url);
+                        },
+                        buttons: {
+                            "Edit Student": function () {
+                                editStudentProcessing(url);
+                            },
+                            Close: function () {
+                                $(this).dialog("close");
+                                $("#EditDialogDiv").hide();
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+                this.closeDialog = function () {
+                    $(this).dialog("close");
+                    location.reload();
+                }
+            }
+
+            $(".EditStudent").on("click", function (e) {
+                DialogEdit = new DialogEdit();
+                url = $(this).attr('href');
+                DialogEdit.showDialog(url);
+                e.preventDefault();
+                return false;
+            });
+        });
+
+        function editStudentProcessing(posturl) {
+            $.ajax({
+                url: posturl,
+                type: "POST",
+                data: $('form').serialize(),
+                success: function (data) {
+                    if (data) {
+                        if (data.result == true) {
+                            $("#divStatus").html(data.responseText).removeClass("text-danger");
+                            $("#divStatus").html(data.responseText).addClass("text-success");
+                        }
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    $("#divStatus").removeClass("text-success");
+                    $("#divStatus").html(textStatus + " Error: " + errorThrown).addClass("text-danger");
+                }
+            });
+        }
+    </script>
+}

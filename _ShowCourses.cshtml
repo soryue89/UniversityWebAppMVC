@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Park_University_MVC.Models.Courses>
+
+<hr />
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CourseNum)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DepartmentId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CourseName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Credits)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.CourseNum)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DepartmentId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CourseName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Credits)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "_UpdateCourse", new { id=item.CourseNum },new { @class = "editCourse"}) 
+        </td>
+    </tr>
+}
+
+</table>
+<div id="divEdit" style="display:none"></div>
+
+@section Scripts{
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+        $(function () {
+            $(".editCourse").on("click", function () {
+                var rowEdit = $(this).closest('tr');
+                var posturl = $(this).attr('href');
+                $("#divEdit").show();
+                $("#divEdit").dialog({
+                    autoOpen: true,
+                    width: "600",
+                    resizable: false,
+                    title: "Edit Course",
+                    modal: true,
+                    closeText: "X",
+                    dialogClass: "alert",
+                    position: {
+                        my: "center",
+                        at: "top+150"
+                    },
+                    closeOnEscape: true,
+                    open: function () {
+                        $(this).load(posturl);
+                    },
+                    buttons: {
+                        "Edit Course": function () {
+                            $.ajax({
+                                url: posturl,
+                                type: "POST",
+                                data: $('form').serialize(),
+                                success: function (data) {
+                                    if (data)
+                                    {
+                                        if (data.result == true) {
+                                            $("#divStatus").html(data.responseText).removeClass("text-danger");
+                                            $("#divStatus").html(data.responseText).addClass("text-success");
+                                        }
+                                        else {
+                                            $("#divStatus").html(data.responseText).removeClass("text-danger");
+                                            $("#divStatus").html(data.responseText).addClass("text-success");
+                                        }
+                                    }
+                                },
+                                error: function(XMLHttpRequest, textStatus, errorThrown){
+                                    $("#divStatus").html(data.responseText).removeClass("text-success");
+                                    $("#divStatus").html(textStatus + " Error:" + errorThrown).addClass("text-danger");
+                                }
+                            });
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

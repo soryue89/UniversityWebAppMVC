@@ -1,0 +1,10 @@
+﻿@{
+    if (!string.IsNullOrEmpty(ViewBag.Message))
+    {
+        <script>
+            alert("@ViewBag.Message");</script>
+    }
+}
+
+<br/>
+@Html.ActionLink("back to the course register","CourseRegister")

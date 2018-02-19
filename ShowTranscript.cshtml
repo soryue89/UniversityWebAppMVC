@@ -1,0 +1,25 @@
+﻿@model Park_University_MVC.Models.ShowTranscriptVM
+
+@{
+    ViewBag.Title = "ShowTranscript";
+}
+
+<h2>ShowTranscript</h2>
+
+@using (Html.BeginForm())
+{
+    <table>
+        <tr>
+            <td style="width:150px;vertical-align:top">
+                @Html.Label("Average GPA:")
+                @Model.GPA.ToString()
+            </td>
+            <td style="width:90%">
+                @{
+                    Html.RenderPartial("_ShowTranscript", Model.TranscriptList);
+                }
+            </td>
+        </tr>
+    </table>
+ }
+

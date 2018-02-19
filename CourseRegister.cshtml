@@ -1,0 +1,37 @@
+﻿@model Park_University_MVC.Models.CourseRegisterVM
+
+@{
+    ViewBag.Title = "CourseRegister";
+}
+
+<h2>CourseRegister</h2>
+
+@using (Html.BeginForm())
+{
+    
+    @Html.AntiForgeryToken()
+    <table>
+        <tr>
+            <td style="width:200px;vertical-align:top">
+                @Html.DropDownListFor(x => x.SelectedSemester, Model.SList)<br/><br/>
+                @Html.DropDownListFor(x => x.SelectedCoursesNum, Model.CList)<br/><br/>
+                @Html.ActionLink("Register","_Register", new { cnum = Model.SelectedCoursesNum , semester = Model.SelectedSemester })
+        </td>
+        <td style="width:90%">
+            @{
+                Html.RenderPartial("_ShowEnrollment", Model.EList);
+            }
+        </td>
+        </tr>
+    </table>
+}
+
+@section Scripts{
+    <script>
+        $(function () {
+            $("#SelectedSemester").change(function () {
+                $('form').submit();
+            });
+        });
+    </script>
+    }

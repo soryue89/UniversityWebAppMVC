@@ -1,0 +1,143 @@
+﻿@model Park_University_MVC.Models.CoursesManagementVM
+
+@{
+    ViewBag.Title = "Courses";
+}
+
+<h2>Courses</h2>
+
+@using (Html.BeginForm())
+{
+    <table>
+        <tr>
+            <th>
+                <hr />List of Courses
+            </th>
+        </tr>
+        <tr>
+            <td>
+                @Html.ActionLink("Add New Course", "_AddCourse")
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table class="table">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Course.CourseNum)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Course.DepartmentId)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Course.CourseName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Course.Description)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Course.Credits)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var item in Model.CList)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CourseNum)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DepartmentId)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CourseName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Credits)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "_UpdateCourse", new { id = item.CourseNum }, new { @class = "editCourse" })
+                            </td>
+                        </tr>
+                    }
+                    </table>
+            </td>
+        </tr>
+    </table>
+}
+<div id="divEdit" style="display:none"></div>
+
+@section Scripts{
+    <script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/Scripts/jquery-ui-1.12.1.min.js"></script>
+    <script>
+        $(function () {
+            $('#divEdit').on('hide', function () {
+                location.reload();
+            });
+            $(".editCourse").on("click", function (e) {
+                $("#divEdit").show();
+                $("#divEdit").dialog({
+                    autoOpen: true,
+                    width: "600",
+                    resizable: false,
+                    title: "Edit Course",
+                    modal: true,
+                    closeText: "X",
+                    dialogClass: "alert",
+                    position: {
+                        my: "center",
+                        at: "top+150"
+                    },
+                    closeOnEscape: true,
+                    open: function () {
+                        var url = $(".editCourse").attr('href');
+                        $("#divEdit").load(url);
+                    },
+                    buttons: {
+                        "Edit Course": function () {
+                            var url = $('.editCourse').attr('href');
+                            $.ajax({
+                                url: url,
+                                type: "POST",
+                                data: $('form').serialize(),
+                                success: function (data) {
+                                    if (data)
+                                    {
+                                        if (data.result == true) {
+                                            $("#divStatus").html(data.responseText).removeClass("text-danger");
+                                            $("#divStatus").html(data.responseText).addClass("text-success");
+                                            location.reload();
+                                        }
+                                        else {
+                                            $("#divStatus").html(data.responseText).removeClass("text-danger");
+                                            $("#divStatus").html(data.responseText).addClass("text-success");
+                                        }
+                                    }
+                                },
+                                error: function(XMLHttpRequest, textStatus, errorThrown){
+                                    $("#divStatus").html(data.responseText).removeClass("text-success");
+                                    $("#divStatus").html(textStatus + " Error:" + errorThrown).addClass("text-danger");
+                                }
+                            });
+                        },
+                        "Close": function () {
+                            $("#divEdit").hide();
+                            location.reload();
+                        }
+                    },
+                    close: function () {
+                        $("#divEdit").hide();
+                        location.reload();
+                    }
+                });
+                e.preventDefault();
+                return false;
+            });
+        });
+    </script>
+}

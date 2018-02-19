@@ -1,0 +1,52 @@
+﻿@model Park_University_MVC.Models.EnrollmentVM
+@{
+    ViewBag.Title = "ShowEnrollment";
+}
+
+<h2>ShowEnrollment</h2>
+
+@{
+    if (!string.IsNullOrEmpty(ViewBag.Message))
+    {
+        <script>alert("@ViewBag.Message");</script>
+    }
+}
+
+<br/>
+
+@using (Html.BeginForm())
+{    
+    <table>
+        <tr>
+            <td style="width:150px;vertical-align:top">
+                @Html.Label("Course", htmlAttributes: new { @class = "control-label" })
+                @Html.DropDownListFor(x => x.CourseSelected, Model.CList, new { htmlAttributes = new { @class = "form-control" } })
+            </td>
+            <td style="width:90%">
+                <div id="tableEnrollment"></div>
+            </td>
+        </tr>
+    </table>
+}
+
+@section Scripts{
+    <script>
+            $(function () {
+                $.getJSON("/Registrar/GetEnrollmentsPartial/" + $("#CourseSelected").val(), function (data) {
+                    if (data)
+                        $("#tableEnrollment").html(data.data);
+                    else
+                        $("#tableEnrollment").html("Problem in loading data");
+                });
+                $("#CourseSelected").change(function () {
+                    $("#divProducts").html("Please wait, loading data...");
+                    $.getJSON("/Registrar/GetEnrollmentsPartial/" + $("#CourseSelected").val(), function (data) {
+                        if (data)
+                            $("#tableEnrollment").html(data.data);
+                        else
+                            $("#tableEnrollment").html("Problem in loading data")
+                    });
+                });
+            });
+    </script>
+}
